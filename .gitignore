@@ -1,0 +1,45 @@
+weights/
+logs/
+__pycache__/
+data/
+tensorflow_datasets/
+testdir/
+cloud.jepg
+confusion_matrix.png
+cvquick-key.pem
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs and checkpoints
+logs/
+weights/
+runs/
+*.pt
+*.pth
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode / PyCharm settings
+.vscode/
+.idea/
+
+# TensorBoard logs
+events.out.tfevents.*
+
+# Build
+build/
+dist/
+*.egg-info/
