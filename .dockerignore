@@ -1,0 +1,87 @@
+# Weights & logs
+weights/
+logs/
+runs/
+*.pt
+*.pth
+
+# Data
+data/
+tensorflow_datasets/
+testdir/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# TensorBoard logs
+events.out.tfevents.*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Sensitive files
+cvquick-key.pem
+
+# Generated images
+confusion_matrix.png
+*.jpeg
+*.jpg
+*.png
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# TensorBoard logs
+events.out.tfevents.*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Sensitive files
+cvquick-key.pem
+
+# Generated images
+confusion_matrix.png
+*.jpeg
+*.jpg
+*.png

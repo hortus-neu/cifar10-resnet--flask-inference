@@ -7,6 +7,7 @@ The workflow includes:
 - TensorBoard visualization and evaluation with confusion matrix  
 - Flask-based inference API (with `/health` and `/predict` endpoints)  
 - Deployment on AWS EC2 (tested on Ubuntu 22.04 + Python 3.10)
+- Published Docker image to Docker Hub and deployed on AWS EC2 for reproducible inference service
 
 ---
 
@@ -35,7 +36,7 @@ Requirements:
 - tensorboard
 - flask
 - pillow
-
+---
 ## Training
 Run training with:
 ```
@@ -43,19 +44,20 @@ python src/train.py
 ```
 The training has two phases:
   1. Warm-up: freeze backbone, only train the last FC
-  2. layer.Fine-tuning: unfreeze `layer4 + fc`, train with smaller learning rate.
+  2. Fine-tuning: unfreeze `layer4 + fc`, train with smaller learning rate.
       - TensorBoard logs will be saved in `logs/`.
       - Best weights will be saved in `weights/resnet18_finetune_best.pt`.
 
-![Training Process](results/training_process.png)
 
-## Example Training Log:
+
+### Example Training Log:
 ```
 [Fine 10] train_loss=0.8703 acc=0.6922 | val_loss=0.9546 acc=0.6630
 ✅ Training finished! Best val_acc=0.6774, weights saved to weights/resnet18_finetune_best.pt
 ✅ Test Accuracy: 0.6855
 ```
-
+![Training Process](results/training_process.png)
+---
 ## Inference API (Flask)
 After training, you can start the Flask server:
 ```
@@ -86,6 +88,64 @@ Example response:
   ]
 }
 ```
+---
+
+## Docker Hub (Pull & Run)
+
+You can pull the prebuilt image and run it directly:
+
+```bash
+docker pull hetao2025/cvquick:latest
+
+# Run (map host port 5001 -> container 5000; mount weights)
+docker run --rm -p 5001:5000 \
+  -v $(pwd)/weights:/app/weights \
+  -e WEIGHTS_PATH=/app/weights/resnet18_finetune_best.pt \
+  --name cvquick \
+  hetao2025/cvquick:latest
+```
+### Access
+Health check: http://localhost:5001/health
+
+Web form: http://localhost:5001/
+
+Prediction example:
+```bash
+curl -X POST http://localhost:5001/predict \
+  -F "image=@test_images/cat.jpg"
+```
+### Build & Push (for AWS EC2 amd64)
+
+On an Apple Silicon Mac, build an amd64 image and push:
+
+```bash
+docker buildx create --use
+docker buildx build \
+  --platform linux/amd64 \
+  -t hetao2025/cvquick:0.1 \
+  -t hetao2025/cvquick:latest \
+  --push .
+```
+## Quick Deploy on AWS EC2 (Ubuntu)
+
+```bash
+# 1) Install Docker
+sudo apt-get update && sudo apt-get install -y docker.io
+sudo systemctl enable --now docker
+
+# 2) Prepare weights
+mkdir -p ~/weights
+# scp from local: scp -i <key.pem> ./weights/resnet18_finetune_best.pt ubuntu@<EC2_IP>:/home/ubuntu/weights/
+
+# 3) Pull & run
+docker pull hetao2025/cvquick:latest
+docker run -d -p 5000:5000 \
+  -v /home/ubuntu/weights:/app/weights \
+  -e WEIGHTS_PATH=/app/weights/resnet18_finetune_best.pt \
+  --name cvquick \
+  hetao2025/cvquick:latest
+```
+---
 ## Repository Structure
 ```bash
 .
@@ -104,8 +164,11 @@ Example response:
 ├── requirements.txt         # dependencies
 ├── README.md                # documentation
 └── LICENSE                  # open-source license
-```
+├── Dockerfile
+├── .dockerignore
 
+```
+---
 ## Results
 
 ### Test Accuracy
@@ -128,6 +191,7 @@ Server logs showing inference requests:
 ![Flask Logs](results/flask_logs.png)
 
 
+---
 ## Citation
 If you use this repo in your work, please cite:
 
@@ -139,16 +203,19 @@ If you use this repo in your work, please cite:
   howpublished = {\url{https://github.com/hortus-neu/cifar10-resnet--flask-inference}},
 }
 ```
+---
 
 ## License
+
 This project is released under the MIT License.
 See [LICENSE](LICENSE) for details.
 
+---
 ## TBC
-1. Dockerize the Flask API for reproducible deployment
-2. Extend experiments to other datasets (e.g., CIFAR-100, Tiny-ImageNet)
-3. Try advanced schedulers or optimizers
-
+  
+1. Extend experiments to other datasets (e.g., CIFAR-100, Tiny-ImageNet)
+2. Try advanced schedulers or optimizers
+---
 ## Acknowledgment
 Thanks to Cloud, for keeping me company during this project and making me laugh🐾.
 ![Cloud](test_images/cloud.jpeg)
