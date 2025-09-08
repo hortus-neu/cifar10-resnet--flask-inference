@@ -47,6 +47,8 @@ The training has two phases:
       - TensorBoard logs will be saved in `logs/`.
       - Best weights will be saved in `weights/resnet18_finetune_best.pt`.
 
+![Training Process](results/training_process.png)
+
 ## Example Training Log:
 ```
 [Fine 10] train_loss=0.8703 acc=0.6922 | val_loss=0.9546 acc=0.6630
